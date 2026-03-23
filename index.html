@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Card Game: War</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+    #log { margin-top: 20px; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Card Game: War</h1>
+  <button onclick="playRound()">Play Round</button>
+  <button onclick="resetGame()">Reset Game</button>
+  <div id="status"></div>
+  <div id="log"></div>
+
+  <script>
+    const suits = ["♠", "♥", "♦", "♣"];
+    const values = [
+      {name:"2", val:2}, {name:"3", val:3}, {name:"4", val:4}, {name:"5", val:5},
+      {name:"6", val:6}, {name:"7", val:7}, {name:"8", val:8}, {name:"9", val:9},
+      {name:"10", val:10}, {name:"J", val:11}, {name:"Q", val:12}, {name:"K", val:13}, {name:"A", val:14}
+    ];
+
+    let playerDeck = [], computerDeck = [], playerScore = 0, computerScore = 0;
+
+    function createDeck() {
+      let deck = [];
+      for (let suit of suits) {
+        for (let v of values) {
+          deck.push({card: v.name + suit, value: v.val});
+        }
+      }
+      return deck;
+    }
+
+    function shuffle(deck) {
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      return deck;
+    }
+
+    function deal() {
+      let deck = shuffle(createDeck());
+      playerDeck = deck.slice(0, 26);
+      computerDeck = deck.slice(26);
+      playerScore = 0;
+      computerScore = 0;
+      document.getElementById("status").innerText = "Game started! Click 'Play Round'.";
+      document.getElementById("log").innerHTML = "";
+    }
+
+    function playRound() {
+      if (playerDeck.length === 0 || computerDeck.length === 0) {
+        endGame();
+        return;
+      }
+      let playerCard = playerDeck.shift();
+      let computerCard = computerDeck.shift();
+
+      let log = document.getElementById("log");
+      log.innerHTML += `<p>You: ${playerCard.card} | Computer: ${computerCard.card}</p>`;
+
+      if (playerCard.value > computerCard.value) {
+        playerScore++;
+        log.innerHTML += `<p><strong>You win this round!</strong></p>`;
+      } else if (playerCard.value < computerCard.value) {
+        computerScore++;
+        log.innerHTML += `<p><strong>Computer wins this round!</strong></p>`;
+      } else {
+        log.innerHTML += `<p><strong>It's a tie!</strong></p>`;
+      }
+
+      document.getElementById("status").innerText = `Score - You: ${playerScore} | Computer: ${computerScore}`;
+    }
+
+    function endGame() {
+      let result = "";
+      if (playerScore > computerScore) result = "🎉 You win the game!";
+      else if (playerScore < computerScore) result = "💻 Computer wins the game!";
+      else result = "🤝 It's a draw!";
+      document.getElementById("status").innerText = result;
+    }
+
+    function resetGame() {
+      deal();
+    }
+
+    // Start automatically
+    deal();
+  </script>
+</body>
+</html>
